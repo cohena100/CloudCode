@@ -56,7 +56,7 @@ Parse.Cloud.define("deleteConnection", function(request, response) {
                     data["cid"] = connection.id
                     response.success(data)
                 },
-                error: function(myObject, error) {
+                error: function(object, error) {
                     response.error("deleting connection failed with error: " + error.message)
                 }
             })
@@ -115,3 +115,62 @@ Parse.Cloud.define("inviteAgain", function(request, response) {
     })
 })
 
+Parse.Cloud.define("acceptInvitation", function(request, response) {
+    var data = {}
+    var vn = request.params.vn
+    var query = new Parse.Query("MyConnection")
+    query.equalTo("vn", vn)
+    query.doesNotExist("acceptedAt")
+    query.find({
+        success: function(connections) {
+            if (connections.length == 0) {
+                response.error("connection not found")
+                return
+            }
+            var connection = connections[0]
+            connection.set("acceptedAt", new Date())
+            var to = request.user
+            connection.set("to", to)
+            connection.save(null, {
+                success: function(connection) {
+                    data["vn"] = connection.get("vn")
+                    data["cid"] = connection.id
+                    var cid = request.params.cid
+                    if (!cid) {
+                        response.success(data)
+                        return
+                    }
+                    var query = new Parse.Query("MyConnection")
+                    query.equalTo("objectId", cid)
+                    query.find({
+                        success: function(connections) {
+                            if (connections.length == 0) {
+                                response.success(data)
+                                return
+                            }
+                            var connection = connections[0]
+                            connection.destroy({
+                                success: function(connection) {
+                                    response.success(data)
+                                },
+                                error: function(object, error) {
+                                    response.success(data)
+                                }
+                            })
+                        },
+                        error: function(object, error) {
+                            console.log("finding connection failed with error: " + error.message);
+                            response.success(data)
+                        }
+                    })
+                },
+                error: function(object, error) {
+                    response.error("connection update failed with error: " + error.message)
+                }
+            })
+        },
+        error: function(object, error) {
+            response.error("finding connection failed with error: " + error.message)
+        }
+    })
+})
