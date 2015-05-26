@@ -174,3 +174,12 @@ Parse.Cloud.define("acceptInvitation", function(request, response) {
         }
     })
 })
+
+Parse.Cloud.define("addEnterLocation", function(request, response) {
+    var data = {}
+    data["accuracy"] = 50.0
+    data["radius"] = 70.0
+    lid = Math.uuid()
+    data["lid"] = lid
+    response.success(data)
+})
