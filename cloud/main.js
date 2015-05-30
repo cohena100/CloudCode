@@ -10,6 +10,16 @@ function generateVN() {
     return '' + digit1 + digit2 + digit3 + digit4
 }
 
+function uuid() {
+    var d = new Date().getTime()
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0
+        d = Math.floor(d/16)
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16)
+    })
+    return uuid
+}
+
 var MyConnection = Parse.Object.extend("MyConnection", {
         initialize: function(attrs, options) {
         }
@@ -179,7 +189,6 @@ Parse.Cloud.define("addEnterLocation", function(request, response) {
     var data = {}
     data["accuracy"] = 50.0
     data["radius"] = 70.0
-    lid = Math.uuid()
-    data["lid"] = lid
+    data["lid"] = uuid()
     response.success(data)
 })
