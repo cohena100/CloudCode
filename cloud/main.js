@@ -192,3 +192,9 @@ Parse.Cloud.define("addEnterLocation", function(request, response) {
     data["lid"] = uuid()
     response.success(data)
 })
+
+Parse.Cloud.define("didEnterLocation", function(request, response) {
+    var data = {}
+    data["cid"] = request.cids
+    response.success(data)
+})
